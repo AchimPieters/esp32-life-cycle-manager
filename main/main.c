@@ -4,42 +4,55 @@
 #include "esp_log.h"
 
 #include "lcm_bootcount.h"
+#include "lcm_wifi.h"
+#include "lcm_ota.h"
 
 static const char *TAG = "MAIN";
 
 void app_main(void)
 {
-    // Bootcount init
+    ESP_LOGI(TAG, "ESP32 Life-Cycle-Manager starting...");
+
     lcm_bootcount_init();
     uint32_t bootcount = lcm_get_bootcount();
-
     ESP_LOGI(TAG, "Bootcount = %u", bootcount);
 
-    // Lifecycle acties gebaseerd op bootcount
+    // Voor testdoeleinden kun je OTA config forceren (verwijder straks)
+    ota_config_t cfg = {
+        .use_beta = false
+    };
+    strcpy(cfg.ota_url, "https://github.com/AchimPieters/esp32-life-cycle-manager/releases/latest/download/firmware.bin");
+    strcpy(cfg.fallback_url, "https://fallback.server.com/firmware.bin");
+    lcm_ota_set_config(&cfg);
+
     if (bootcount <= 4) {
-        ESP_LOGI(TAG, "Normal boot");
+        ESP_LOGI(TAG, "Normal boot.");
     } else if (bootcount <= 7) {
-        ESP_LOGW(TAG, "Trigger OTA update...");
-        // lcm_ota_start();  <-- straks toevoegen
+        ESP_LOGW(TAG, "Bootcount = %u → Trigger OTA update", bootcount);
+        lcm_ota_start();
         lcm_clear_bootcount();
     } else if (bootcount <= 10) {
-        ESP_LOGW(TAG, "Wiping WiFi and config");
-        // lcm_wifi_clear_config(); <-- later
+        ESP_LOGW(TAG, "Clearing WiFi config...");
+        lcm_wifi_clear_config();
         lcm_clear_bootcount();
     } else if (bootcount <= 13) {
-        ESP_LOGE(TAG, "Beta mode activated + wipe WiFi");
-        // lcm_wifi_clear_config();
-        // lcm_enable_beta_mode(); <-- NVS flag
+        ESP_LOGW(TAG, "Activating beta mode...");
+        ota_config_t cfg = {0};
+        lcm_ota_get_config(&cfg);
+        cfg.use_beta = true;
+        lcm_ota_set_config(&cfg);
+        lcm_wifi_clear_config();
         lcm_clear_bootcount();
     } else {
-        ESP_LOGE(TAG, "FACTORY RESET initiated!");
-        // lcm_factory_reset(); <-- wis NVS
-        lcm_clear_bootcount();
+        ESP_LOGE(TAG, "FACTORY RESET");
+        nvs_flash_erase();
+        esp_restart();
     }
 
-    // Rest van applicatie
+    lcm_wifi_init();
+
     while (true) {
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
         ESP_LOGI(TAG, "Running...");
     }
 }
