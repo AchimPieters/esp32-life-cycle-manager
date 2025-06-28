@@ -1,12 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head><title>ESP32 WiFi Setup</title></head>
+<head>
+  <title>ESP32 Config Portal</title>
+</head>
 <body>
-<h2>Configure WiFi</h2>
-<form method="POST" action="/submit">
-  SSID: <input type="text" name="ssid"><br>
-  Password: <input type="password" name="password"><br>
-  <input type="submit" value="Connect">
-</form>
+  <h2>Configure WiFi and OTA</h2>
+  <form method="POST" action="/submit">
+    <label>WiFi SSID:</label><br>
+    <input type="text" name="ssid"><br><br>
+
+    <label>Password:</label><br>
+    <input type="password" name="password"><br><br>
+
+    <label>OTA URL:</label><br>
+    <input type="text" name="ota_url" value="https://github.com/yourname/yourrepo/releases/latest/download/firmware.bin"><br><br>
+
+    <label>Fallback OTA URL:</label><br>
+    <input type="text" name="fallback_url" value=""><br><br>
+
+    <label>
+      <input type="checkbox" name="use_beta"> Use Beta Firmware
+    </label><br><br>
+
+    <input type="submit" value="Save and Connect">
+  </form>
 </body>
 </html>
