@@ -1,0 +1,2 @@
+# Default SDK configuration
+CONFIG_OTA_FIRMWARE_URL="https://github.com/AchimPieters/esp32-life-cycle-manager/releases/latest/download/firmware.bin"

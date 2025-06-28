@@ -1,0 +1,10 @@
+# Kconfig for ESP32 Life-Cycle-Manager
+menu "ESP32 Life-Cycle-Manager Configuration"
+
+config OTA_FIRMWARE_URL
+    string "Default OTA Firmware URL"
+    default "https://github.com/AchimPieters/esp32-life-cycle-manager/releases/latest/download/firmware.bin"
+    help
+      URL of the firmware binary for OTA updates.
+
+endmenu

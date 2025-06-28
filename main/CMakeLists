@@ -1,0 +1,14 @@
+idf_component_register(
+    SRCS
+        "main.c"
+        "lcm_bootcount.c"
+        "lcm_wifi.c"
+        "lcm_ota.c"
+    INCLUDE_DIRS "."
+)
+
+# Bundel het TLS-rootcertificaat
+target_add_binary_data(${COMPONENT_TARGET}
+    "certs.pem"
+    TEXT
+)
